@@ -1,35 +1,51 @@
-// Static and recognized pin-holders:
-int led = 13;
+#define MAX_SENSORS 5
+#define MAX_MOTORS 3
 
-// Setup functions for the first run, should boot the LEDs
-// and sensors to prepare for the main loop.
+/* Motors */
+typedef struct {
+  char name[36];
+  int pin;
+  int speed;
+} Motor;
+
+/* Sensors */
+
+
+typedef struct {
+  char name[36];
+  int pin;
+  int value;
+} Sensor;
+
+Motor motors[MAX_MOTORS];
+Sensor sensors[MAX_SENSORS];
+
+
 void setup() {
-  int sensors[] = {led};
-  setupSensors(sensors);
+
+  motors[0] = (Motor){"Front motor", 13, 0};
+  motors[1] = (Motor){"Left-back motor", 14, 0};
+  motors[2] = (Motor){"Right-back motor", 15, 0};
+
+
+  sensors[0] = (Sensor){"Front ultrasonic sensor", 5, 0};
+  sensors[1] = (Sensor){"Back ultrasonic sensor", 6, 0};
+  sensors[2] = (Sensor){"Left ultrasonic sensor", 7, 0};
+  sensors[3] = (Sensor){"Right ultrasonic sensor", 8, 0};
+  sensors[4] = (Sensor){"IR sensor", 9, 0};
+
+
 }
 
-// Setup the sensors given as parameters. Should be extendable
-// in case we remove or add more later on.
-void setupSensors(int pins[]) {
-  for(int i = 0; i < sizeof(pins); i++) {
-     pinMode(pins[i], OUTPUT);    
+
+void setup_sensors() {
+  for (int i = 0; i < MAX_SENSORS; i++) {
+    pinMode(sensors[i].pin, INPUT);
   }
 }
 
-// Main loop and lifetime functions.
+
 void loop() {
-  blinkLED();
-  
-  // Here we should check for battery life, and define "land" and
-  // adjust axis methods. The x and y-axis methods should be combined,
-  // whereas angle rotations on the z-axis should be independant.
+
 }
 
-// Blinks the recognized LED pin. Comments from example
-// code sketch.
-void blinkLED() {
-  digitalWrite(led, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(1000);               // wait for a second
-  digitalWrite(led, LOW);    // turn the LED off by making the voltage LOW
-  delay(1000);               // wait for a second
-}
