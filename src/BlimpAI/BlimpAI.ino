@@ -3,52 +3,90 @@
 
 #define MAX_SENSORS 5
 #define MAX_MOTORS 3
+#define LED_PIN 13
+
+/************************************************************************/
+/****************************** Structures ******************************/
+/************************************************************************/
 
 typedef struct {
 	char name[36];	// Human-assigned name (english)
 	int pin;		// Hardware pin on board
 	float speed;	// Speed (relative rate)
+	bool analog;
 } Motor;
 
 typedef struct {
 	char name[36];
 	int pin;
 	int value;
+	bool analog;
 } Sensor;
 
 // Arrays for all installed motors and sensors
 Motor motors[MAX_MOTORS];
 Sensor sensors[MAX_SENSORS];
-int i = 0;
 
+/************************************************************************/
+/********************************* Setup ********************************/
+/************************************************************************/
+
+// Straightforward initialization for all sensors in array
 void setup_sensors() {
-	for (i = 0; i < MAX_SENSORS; i++) {
-		pinMode(sensors[i].pin, INPUT);
+	for (int i = 0; i < MAX_SENSORS; i++) {
+		Sensor sensor = sensors[i];
+		if (!sensor.analog) {
+			pinMode(sensors[i].pin, INPUT);
+		}
 	}
 }
 
-void setup_motors() {
-	for (i = 0; i < MAX_MOTORS; i++) {
+// Straightforward initialization for all motors in array
+void digital_setup_motors() {
+	for (int i = 0; i < MAX_MOTORS; i++) {
 		pinMode(motors[i].pin, OUTPUT);
 	}
 }
 
+// Standard Arduino setup function
 void setup() {
+	pinMode(LED_PIN, OUTPUT);
+
+	/*
 	motors[0] = (Motor){"Front motor", 13, 0};
 	motors[1] = (Motor){"Left-back motor", 14, 0};
 	motors[2] = (Motor){"Right-back motor", 15, 0};
+	setup_motors();
 
 	sensors[0] = (Sensor){"Front ultrasonic sensor", 5, 0};
 	sensors[1] = (Sensor){"Back ultrasonic sensor", 6, 0};
 	sensors[2] = (Sensor){"Left ultrasonic sensor", 7, 0};
 	sensors[3] = (Sensor){"Right ultrasonic sensor", 8, 0};
-	sensors[4] = (Sensor){"IR sensor", 9, 0};
-
+	*/
+	
+	sensors[0] = (Sensor){"Infrared", 2, 0};
 	setup_sensors();
-	setup_motors();
+	
+	test_infrared(sensors[0].pin);
 }
 
-// In order to assure complete operability, BlimpAI will periodically check the hardware connection for status of its battery. The results of this test will determine the next immediate phase: if the bot is in standby, launching or landing, if the bot in airborne, wandering or homing. The barebones translation of this portion goes something like:
+
+/************************************************************************/
+/******************************** Tests *********************************/
+/************************************************************************/
+
+void test_infrared(int pin) {
+	int sensorValue = analogRead(pin);		// read the value from the sensor
+	digitalWrite(LED_PIN, HIGH);			// turn the ledPin on
+	delay(sensorValue);						// stop the program for <sensorValue> milliseconds
+	digitalWrite(LED_PIN, LOW);				// turn the ledPin off
+	delay(sensorValue);						// stop the program for for <sensorValue> milliseconds
+}
+
+/************************************************************************/
+/******************************** Phases ********************************/
+/************************************************************************/
+
 void check_charge() {
 /*
  if (current_cycle - last_cycle_checked) >= periodic_check_cycles
@@ -62,6 +100,7 @@ void check_charge() {
 */
 }
 
+// In order to assure complete operability, BlimpAI will periodically check the hardware connection for status of its battery. The results of this test will determine the next immediate phase: if the bot is in standby, launching or landing, if the bot in airborne, wandering or homing. The barebones translation of this portion goes something like:
 void preflight() {
 	check_charge();
 }
@@ -130,7 +169,10 @@ void land() {
 */
 }
 
+/************************************************************************/
+/******************************* Run Loop *******************************/
+/************************************************************************/
+
 void loop() {
 	preflight();
 }
-
