@@ -1,7 +1,7 @@
 #define MAX_POWER 255
 #define MIN_POWER 0
-#define WAIT_DELAY 750
-#define TOLERANCE 2
+#define WAIT_DELAY 1500
+#define TOLERANCE 10
 
 int ar = 1; // analog
 int ctrl = 7; // analog
@@ -13,7 +13,7 @@ int bmotor2 = 5; // digital->analog
 int fmotor3 = 6; // digital->analog
 int bmotor3 = 7; // digital->analog
 
-int lastavg;
+int range = 20;
 
 // prepare serial for debug writing
 void setup() {
@@ -38,9 +38,12 @@ void loop() {
   Serial.println(avg, DEC);
   
   int delayAmount = WAIT_DELAY;
+  if (range > (avg + TOLERANCE) || range < (avg - TOLERANCE)) {
+    range = avg;
+  }
   
   // forwards
-  if (lastavg - avg > TOLERANCE) {
+  if (avg < range) {
     Serial.println("moving forwards");
     analogWrite(fmotor1, MAX_POWER);
     analogWrite(bmotor1, MIN_POWER);
@@ -65,6 +68,5 @@ void loop() {
     analogWrite(bmotor3, MAX_POWER);
   }  
   
-  lastavg = avg;
   delay(delayAmount);
 }
