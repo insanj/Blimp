@@ -1,5 +1,8 @@
-int ar = 0; // analog
-int ctrl = 5; // analog
+#define MAX_POWER 255
+#define WAIT_DELAY 500
+
+int ar = 1; // analog
+int ctrl = 7; // analog
 int motor = 9; // analog
 
 // prepare serial for debug writing
@@ -13,17 +16,19 @@ void setup() {
 void motor_power(boolean dir, int delayAmount) {
   if (dir) {
     Serial.println("moving forwards");
-    analogWrite(9, 255);
+    analogWrite(motor, MAX_POWER);
   }
   
   else {
     Serial.println("moving backwards");
-    analogWrite(9, -255);
+    analogWrite(motor, -MAX_POWER);
   }
   
-  delay(5);
-  delayAmount -= 5;
-  if (delayAmount > 5) {
+  int smallDelay = 5;
+  delay(smallDelay);
+  delayAmount -= smallDelay;
+  
+  if (delayAmount > smallDelay) {
     motor_power(dir, delayAmount);
   }
 }
@@ -34,7 +39,8 @@ void motor_power(boolean dir, int delayAmount) {
 // the motor for 5 seconds in the specified direction, waits, and does
 // it again.
 void loop() {
-  analogWrite(ctrl, 255); 
+  Serial.println("getting measurement data");
+  analogWrite(ctrl, MAX_POWER); 
   
   delay(20); // 16.5ms ± 3.7ms
   int sensorValue = analogRead(ar); // first measurement
@@ -45,7 +51,7 @@ void loop() {
   int avg = (sensorValue + sensorValue2) / 2; // average measurement
   Serial.println(avg, DEC);
   
-  int delayAmount = 500;
+  int delayAmount = WAIT_DELAY;
   
   // forwards
   if (avg < 25) {
@@ -57,5 +63,5 @@ void loop() {
     motor_power(false, delayAmount);
   }  
 
-  delay(delayAmount + 5);
+  delay(delayAmount + 50);
 }
