@@ -3,7 +3,6 @@
 
 #define MAX_SENSORS 5
 #define MAX_MOTORS 3
-#define LED_PIN 13
 
 /************************************************************************/
 /****************************** Structures ******************************/
@@ -35,14 +34,16 @@ Sensor sensors[MAX_SENSORS];
 void setup_sensors() {
 	for (int i = 0; i < MAX_SENSORS; i++) {
 		Sensor sensor = sensors[i];
-		if (!sensor.analog) {
-			pinMode(sensors[i].pin, INPUT);
+		if (!sensor.analog && sensor.pin != 0) {
+                        Serial.println("Setting up digital device in pin: ");
+                        Serial.println(sensor.pin, DEC);
+			pinMode(sensor.pin, INPUT);
 		}
 	}
 }
 
 // Straightforward initialization for all motors in array
-void digital_setup_motors() {
+void setup_motors() {
 	for (int i = 0; i < MAX_MOTORS; i++) {
 		pinMode(motors[i].pin, OUTPUT);
 	}
@@ -50,7 +51,7 @@ void digital_setup_motors() {
 
 // Standard Arduino setup function
 void setup() {
-	pinMode(LED_PIN, OUTPUT);
+	Serial.begin(9600);
 
 	/*
 	motors[0] = (Motor){"Front motor", 13, 0};
@@ -63,24 +64,12 @@ void setup() {
 	sensors[2] = (Sensor){"Left ultrasonic sensor", 7, 0};
 	sensors[3] = (Sensor){"Right ultrasonic sensor", 8, 0};
 	*/
-	
-	sensors[0] = (Sensor){"Infrared", 2, 0};
+
+        motors[0] = (Motor){"Motor", 6, 0, false};
+        setup_motors();
+        
+	sensors[0] = (Sensor){"Infrared", 0, 0, true};
 	setup_sensors();
-	
-	test_infrared(sensors[0].pin);
-}
-
-
-/************************************************************************/
-/******************************** Tests *********************************/
-/************************************************************************/
-
-void test_infrared(int pin) {
-	int sensorValue = analogRead(pin);		// read the value from the sensor
-	digitalWrite(LED_PIN, HIGH);			// turn the ledPin on
-	delay(sensorValue);						// stop the program for <sensorValue> milliseconds
-	digitalWrite(LED_PIN, LOW);				// turn the ledPin off
-	delay(sensorValue);						// stop the program for for <sensorValue> milliseconds
 }
 
 /************************************************************************/
@@ -96,7 +85,7 @@ void check_charge() {
 		 homing_phase()
 	 else
 		 last_cycle_checked = current_cycle
- 
+
 */
 }
 
@@ -121,7 +110,7 @@ void wander() {
  dir = pick_direction(specific_dir || c_random)
  motors_on(dir)
  set_timer(3 secs)
- 
+
  if timer_fired
  if averting_collision
  motors_off()
@@ -142,7 +131,7 @@ void home() {
   motors_off()
  ir_direction = ir_detected()
  lost = !ir_direction
- 
+
  if current_time - started_spin_time >= 8 secs (time for 360)
  wandering_phase()
  else if lost
@@ -170,9 +159,34 @@ void land() {
 }
 
 /************************************************************************/
+/******************************** Tests *********************************/
+/************************************************************************/
+
+// Green goes to 3.3V, Orange goes to Ground, Yellow goes to Analog (1)
+// Bulb on left (when facing them) appears to be the emitter
+void test_infrared(int pin) {
+	int sensorValue = analogRead(pin);		// read the value from the sensor
+	Serial.println(sensorValue, DEC);
+}
+
+/************************************************************************/
 /******************************* Run Loop *******************************/
 /************************************************************************/
 
 void loop() {
-	preflight();
+  
+	//preflight();
+	// test_infrared(sensors[0].pin);
+  for (int i =-255; i <=255; i+=1) {
+        analogWrite(9, i);
+        Serial.println(i, DEC);
+       delay(30);
+ }
+  for (int i =255; i >=-255; i-=1) {
+        analogWrite(9, i);
+        Serial.println(i, DEC);
+       delay(30);
+ }
+  
+
 }
