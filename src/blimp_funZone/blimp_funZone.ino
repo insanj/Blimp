@@ -4,48 +4,20 @@
 
 int ar = 1; // analog
 int ctrl = 7; // analog
-int fmotor = 2; // digital
-int bmotor = 3; // digital
+int fmotor = 2; // digital->analog
+int bmotor = 3; // digital->analog
 
 int lastavg;
 
 // prepare serial for debug writing
 void setup() {
   Serial.begin(9600);
-//  pinMode(fmotor, OUTPUT);
-  //pinMode(bmotor, OUTPUT);
-}
-
-// self-looping function for powering the motors for delay amount
-// works by checking direction, then fully powering the motor,
-// waiting 5ms, then powering it again until delay amount is negligible
-void motor_power(boolean dir, int delayAmount) {
-  if (dir) {
-    Serial.println("moving forwards");
-    analogWrite(fmotor, HIGH);
-    analogWrite(bmotor, LOW);
-  }
-  
-  else {
-    Serial.println("moving backwards");
-    analogWrite(fmotor, LOW);
-    analogWrite(bmotor, HIGH);
-  }
-  
- /* int smallDelay = 5;
-  delay(smallDelay);
-  delayAmount -= smallDelay;
-  
-  if (delayAmount > smallDelay) {
-    motor_power(dir, delayAmount);
-  }*/
 }
 
 // basic loop that pings the distance sensor, averages two measurements
-// (as per data sheet), and checks the final result to see if its within
-// the forwards range (0-25) or backwards range (25-inf). then, powers
-// the motor for 5 seconds in the specified direction, waits, and does
-// it again.
+// (as per data sheet), and checks the final result to see if the difference
+// is within a certain tolerance range, then powers the motor accordingly
+// for the WAIT_DELAY ms, then does it again.
 void loop() {
   Serial.println("getting measurement data");
   analogWrite(ctrl, MAX_POWER); 
