@@ -1,13 +1,19 @@
 #define MAX_POWER 255
-#define WAIT_DELAY 500
+#define MIN_POWER 0
+#define WAIT_DELAY 750
 
 int ar = 1; // analog
 int ctrl = 7; // analog
-int motor = 9; // analog
+int fmotor = 2; // digital
+int bmotor = 3; // digital
+
+int lastavg;
 
 // prepare serial for debug writing
 void setup() {
   Serial.begin(9600);
+//  pinMode(fmotor, OUTPUT);
+  //pinMode(bmotor, OUTPUT);
 }
 
 // self-looping function for powering the motors for delay amount
@@ -16,21 +22,23 @@ void setup() {
 void motor_power(boolean dir, int delayAmount) {
   if (dir) {
     Serial.println("moving forwards");
-    analogWrite(motor, MAX_POWER);
+    analogWrite(fmotor, HIGH);
+    analogWrite(bmotor, LOW);
   }
   
   else {
     Serial.println("moving backwards");
-    analogWrite(motor, -MAX_POWER);
+    analogWrite(fmotor, LOW);
+    analogWrite(bmotor, HIGH);
   }
   
-  int smallDelay = 5;
+ /* int smallDelay = 5;
   delay(smallDelay);
   delayAmount -= smallDelay;
   
   if (delayAmount > smallDelay) {
     motor_power(dir, delayAmount);
-  }
+  }*/
 }
 
 // basic loop that pings the distance sensor, averages two measurements
@@ -54,14 +62,19 @@ void loop() {
   int delayAmount = WAIT_DELAY;
   
   // forwards
-  if (avg < 25) {
-    motor_power(true, delayAmount);
+  if (lastavg - avg > 3) {
+    Serial.println("moving forwards");
+    analogWrite(fmotor, MAX_POWER);
+    analogWrite(bmotor, MIN_POWER);
   }
   
   // backwards
   else {
-    motor_power(false, delayAmount);
+    Serial.println("moving backwards");
+    analogWrite(fmotor, MIN_POWER);
+    analogWrite(bmotor, MAX_POWER);
   }  
-
-  delay(delayAmount + 50);
+  
+  lastavg = avg;
+  delay(delayAmount);
 }
