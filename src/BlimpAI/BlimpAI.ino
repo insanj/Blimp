@@ -89,12 +89,18 @@ void check_charge() {
 */
 }
 
-// In order to assure complete operability, BlimpAI will periodically check the hardware connection for status of its battery. The results of this test will determine the next immediate phase: if the bot is in standby, launching or landing, if the bot in airborne, wandering or homing. The barebones translation of this portion goes something like:
+// In order to assure complete operability, BlimpAI will periodically check
+// the hardware connection for status of its battery. The results of this
+// test will determine the next immediate phase: if the bot is in standby,
+// launching or landing, if the bot in airborne, wandering or homing. The
+// barebones translation of this portion goes something like:
 void preflight() {
 	check_charge();
 }
 
-// If the preflight phase cleared, BlimpAI will send signals to power on all of the bot’s motors and rise until it reaches a predetermined height. Once there, it will move out of launch and into wander.
+// If the preflight phase cleared, BlimpAI will send signals to power on all
+// of the bot’s motors and rise until it reaches a predetermined height. Once
+// there, it will move out of launch and into wander.
 void launch() {
 /*
  motors_on(up_dir)
@@ -104,7 +110,14 @@ void launch() {
  */
 }
 
-// After assured that it’s at an acceptable charge level and height, BlimpAI will pick a random direction to “wander.” To sustain adequate flight patterns, the bot will periodically power on the downward and active motors to coast and remain airborne, while conserving battery life. While in pseudo-random wander, BlimpAI will check its ultrasonic sensors to check for obstacles. If it detects an imminent collision, the bot will immediately be prompted to pick a new direction and restart the phase. In addition, this phase includes the same charge-checking code from the preflight phase.
+// After assured that it’s at an acceptable charge level and height, BlimpAI
+// will pick a random direction to “wander.” To sustain adequate flight patterns,
+// the bot will periodically power on the downward and active motors to coast and
+// remain airborne, while conserving battery life. While in pseudo-random wander,
+// BlimpAI will check its ultrasonic sensors to check for obstacles. If it detects
+// an imminent collision, the bot will immediately be prompted to pick a new
+// direction and restart the phase. In addition, this phase includes the same 
+// charge-checking code from the preflight phase.
 void wander() {
 /*
  dir = pick_direction(specific_dir || c_random)
@@ -125,7 +138,13 @@ void wander() {
  */
 }
 
-//Once given the signal to initiate the homing sequence, BlimpAI will break out of all other phases and begin finding its way to the charging dock. First, the bot will a scan the area for an IR beacon. If none can be found, it will first rotate 180 degrees to check its immediate surroundings, then continue in a random direction and check again, following its own specific wander protocol until finding a beacon. Once found, the bot will power its horizontal motors until it’s hovering above it. Once locked above, it will call for the landing phase.
+//Once given the signal to initiate the homing sequence, BlimpAI will break out
+// of all other phases and begin finding its way to the charging dock. First, the
+// bot will a scan the area for an IR beacon. If none can be found, it will first
+// rotate 180 degrees to check its immediate surroundings, then continue in a 
+// random direction and check again, following its own specific wander protocol until
+// finding a beacon. Once found, the bot will power its horizontal motors until it’s
+// hovering above it. Once locked above, it will call for the landing phase.
 void home() {
 /*
   motors_off()
@@ -147,7 +166,11 @@ void home() {
  */
 }
 
-// During this final phase, the bot is instructed by BlimpAI to descend vertically until its ultrasonic sensors detect something below it (presumably the charging station or the floor) in close proximity, at which point it will slowly power off all motors. From this point on, it will begin preflighting until able to take off again
+// During this final phase, the bot is instructed by BlimpAI to descend vertically 
+// until its ultrasonic sensors detect something below it (presumably the charging 
+// station or the floor) in close proximity, at which point it will slowly power off
+// all motors. From this point on, it will begin preflighting until able to take off
+// again
 void land() {
 /*
  set_motor_speed(slow)
